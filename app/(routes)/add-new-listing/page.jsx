@@ -49,7 +49,7 @@ function AddNewListing() {
         <h2 className='font-bold text-3xl'>Add New Listing</h2>
         <div className='p-10  rounded-lg border 
         w-full
-        shadow-md flex flex-col gap-5'>
+        shadow-md flex flex-col items-center gap-5'>
             <h2 className='text-gray-500 text-lg'>Enter Address which you want to list</h2>
             <GoogleAddressSearch
                 selectedAddress={(value)=>setSelectedAddress(value)}
@@ -57,7 +57,7 @@ function AddNewListing() {
             />
             <Button
                 disabled={!selectedAddress|| !coordinates||loader}
-                onClick={nextHandler}
+                onClick={nextHandler} className = "w-full"
             >
                 {loader?<Loader className='animate-spin' />:'Next'}
                 </Button>

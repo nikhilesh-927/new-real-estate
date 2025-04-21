@@ -48,7 +48,7 @@ function EditListing({ params }) {
     const verifyUserRecord = async () => {
         const { data, error } = await supabase
             .from('listing')
-            .select('*,listingImages(listing_id,url)')
+            .select('*,listingimages(listing_id,url)')
             .eq('createdBy', user?.primaryEmailAddress.emailAddress)
             .eq('id', params.id);
         if (data) {
@@ -86,7 +86,7 @@ function EditListing({ params }) {
             const fileName = Date.now().toString();
             const fileExt = fileName.split('.').pop();
             const { data, error } = await supabase.storage
-                .from('listingImages')
+                .from('listingimages')
                 .upload(`${fileName}`, file, {
                     contentType: `image/${fileExt}`,
                     upsert: false
@@ -101,7 +101,7 @@ function EditListing({ params }) {
 
                 const imageUrl = process.env.NEXT_PUBLIC_IMAGE_URL + fileName;
                 const { data, error } = await supabase
-                    .from('listingImages')
+                    .from('listingimages')
                     .insert([
                         { url: imageUrl, listing_id: params?.id }
                     ])
@@ -270,7 +270,7 @@ function EditListing({ params }) {
                                     <h2 className='font-lg text-gray-500 my-2'>Upload Property Images</h2>
                                     <FileUpload
                                         setImages={(value) => setImages(value)}
-                                        imageList={listing.listingImages}
+                                        imageList={listing.listingimages}
                                     />
                                 </div>
                                 <div className='flex gap-7 justify-end'>

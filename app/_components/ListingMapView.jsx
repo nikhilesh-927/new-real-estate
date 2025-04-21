@@ -24,7 +24,7 @@ function ListingMapView({type}) {
     const getLatestListing=async()=>{
         const {data,error}=await supabase
         .from('listing')
-        .select(`*,listingImages(
+        .select(`*,listingimages(
             url,
             listing_id
         )`)
@@ -48,7 +48,7 @@ function ListingMapView({type}) {
         
         let query =  supabase
         .from('listing')
-        .select(`*,listingImages(
+        .select(`*,listingimages(
             url,
             listing_id
         )`)
@@ -85,8 +85,9 @@ function ListingMapView({type}) {
             setCoordinates={setCoordinates}
             />
         </div>
-        <div className='fixed right-10 h-full 
-        md:w-[350px] lg:w-[450px] xl:w-[650px]'>
+        <div className='sticky top-0 h-[80vh] 
+md:w-[350px] lg:w-[450px] xl:w-[650px] px-2'>
+
             <GoogleMapSection
             listing={listing}
             coordinates={coordinates}

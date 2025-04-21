@@ -1,37 +1,30 @@
-import { MarkerF, OverlayView } from '@react-google-maps/api'
-import React, { useState } from 'react'
-import MarkerListingItem from './MarkerListingItem';
+import React from 'react';
+import { Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
 
-function MarkerItem({item}) {
-    const [selectedListing,setSelectedListing]=useState();
+const defaultIcon = L.icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  shadowSize: [41, 41],
+});
+
+function MarkerItem({ item }) {
   return (
-    <div>
-        <MarkerF
-            position={item.coordinates}
-            onClick={()=>setSelectedListing(item)}
-            icon={{
-                url:'/pin.png',
-                scaledSize:{
-                    width:60,
-                    height:60
-                }
-            }}
-        >
-          {selectedListing&&  <OverlayView
-            position={selectedListing.coordinates}
-            mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-            >
-                <div>
-                    <MarkerListingItem 
-                    closeHandler={()=>setSelectedListing(null)}
-                    item={selectedListing} />
-                </div>
-
-            </OverlayView>}
-
-        </MarkerF>
-    </div>
-  )
+    <Marker
+      position={[item.latitude, item.longitude]}
+      icon={defaultIcon}
+    >
+      <Popup>
+        <div>
+          <strong>Listing</strong><br />
+          Lat: {item.latitude}, Lng: {item.longitude}
+        </div>
+      </Popup>
+    </Marker>
+  );
 }
 
-export default MarkerItem
+export default MarkerItem;

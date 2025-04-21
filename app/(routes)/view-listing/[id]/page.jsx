@@ -14,7 +14,7 @@ function ViewListing({params}) {
     const GetListingDetail=async()=>{
         const {data,error}=await supabase
         .from('listing')
-        .select('*,listingImages(url,listing_id)')
+        .select('*,listingimages(url,listing_id)')
         .eq('id',params.id)
         .eq('active',true);
     
@@ -30,7 +30,7 @@ function ViewListing({params}) {
     }
   return (
     <div className='px-4 md:px-32 lg:px-56 py-5'>
-        <Slider imageList={listingDetail?.listingImages} />
+        <Slider imageList={listingDetail?.listingimages} />
         <Details listingDetail={listingDetail} />
     </div>
   )

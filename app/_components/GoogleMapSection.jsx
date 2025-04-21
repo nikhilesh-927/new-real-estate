@@ -1,65 +1,98 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
-import MarkerItem from './MarkerItem';
-const containerStyle = {
-    width: '100%',
-    height: '80vh',
-    borderRadius:10
-  };
-  
+'use client'; // Needed if using Next.js App Router
 
-function GoogleMapSection({coordinates,listing}) {
-   
-    const [center,setCenter]=useState({
-        lat: 40.730610,
-        lng: -73.935242
-      })
-      const [map, setMap] = useState(null)
-    //   const { isLoaded } = useJsApiLoader({
-    //     id: 'google-map-script',
-    //     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACE_API_KEY
-    //   })
-      useEffect(()=>{
-        coordinates&&setCenter(coordinates)
-      },[coordinates])
-     
-      useEffect(() => {
-        if (map) {
-          
-            map.setZoom(10);
-        }
-    }, [map]);
-      const onLoad = useCallback(function callback(map) {
-        // This is just an example of getting and using the map instance!!! don't just blindly copy!
-        const bounds = new window.google.maps.LatLngBounds(center);
-        map.fitBounds(bounds);
-        setMap(map)
-       
-      }, [])
-      const onUnmount = React.useCallback(function callback(map) {
-        setMap(null)
-      }, [])
+import React, { useCallback, useEffect, useState } from 'react';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import MarkerItem from './MarkerItem'; // Your custom MarkerItem component
+import 'leaflet/dist/leaflet.css'; // Make sure this is included!
+
+const containerStyle = {
+  width: '100%',
+  height: '80vh',
+  borderRadius: 10,
+};
+
+// Component to fit bounds dynamically
+const FitBounds = ({ markers }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (markers.length === 0) return;
+
+    const bounds = L.latLngBounds(
+      markers.map(item => [item.latitude, item.longitude])
+    );
+
+    map.invalidateSize(); // Important fix for layout issues
+    map.fitBounds(bounds, { padding: [50, 50] });
+  }, [markers, map]);
+
+  return null;
+};
+
+function GoogleMapSection({ coordinates, listing = [] }) {
+  const [center, setCenter] = useState({
+    lat: 40.73061,
+    lng: -73.935242, // Default to NYC
+  });
+
+  const [map, setMap] = useState(null);
+
+  // Update center when coordinates prop changes
+  useEffect(() => {
+    if (coordinates?.latitude && coordinates?.longitude) {
+      setCenter({
+        lat: coordinates.latitude,
+        lng: coordinates.longitude,
+      });
+    }
+  }, [coordinates]);
+
+  // Filter out invalid listings
+  const validListings = listing.filter(
+    item => item.latitude != null && item.longitude != null
+  );
+
+  const onLoad = useCallback((mapInstance) => {
+    setMap(mapInstance);
+  }, []);
+
+  const onUnmount = useCallback(() => {
+    setMap(null);
+  }, []);
+
   return (
     <div>
-        <GoogleMap
-        mapContainerStyle={containerStyle}
-        center={center}
+      <MapContainer
+        center={[center.lat, center.lng]}
         zoom={10}
-        onLoad={map=>setMap(map)}
-        
-        onUnmount={onUnmount}
-        gestureHandling="greedy"
+        style={containerStyle}
+        whenCreated={onLoad}
+        whenReady={() => {
+          if (map && validListings.length > 0) {
+            const bounds = L.latLngBounds(
+              validListings.map(item => [item.latitude, item.longitude])
+            );
+            map.fitBounds(bounds, { padding: [50, 50] });
+          }
+        }}
+        scrollWheelZoom
       >
-        { /* Child components, such as markers, info windows, etc. */ }
-        {listing.map((item,index)=>(
-            <MarkerItem
-                key={index}
-                item={item}
-            />
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+
+        {/* Auto fit bounds */}
+        <FitBounds markers={validListings} />
+
+        {/* Render custom marker components */}
+        {validListings.map((item, index) => (
+          <MarkerItem key={index} item={item} />
         ))}
-      </GoogleMap>
+      </MapContainer>
     </div>
-  )
+  );
 }
 
-export default GoogleMapSection
+export default GoogleMapSection;

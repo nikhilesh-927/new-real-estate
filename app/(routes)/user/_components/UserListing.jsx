@@ -27,7 +27,7 @@ function UserListing() {
     const GetUserListing=async()=>{
         const {data,error}=await supabase
         .from('listing')
-        .select(`*,listingImages(url,listing_id)`)
+        .select(`*,listingimages(url,listing_id)`)
         .eq('createdBy',user?.primaryEmailAddress.emailAddress);
         setListing(data);
         console.log(data);
@@ -39,7 +39,7 @@ function UserListing() {
     const deleteListing=async(id)=>{
         //Delete Images  Record First
         await supabase
-        .from('listingImages')
+        .from('listingimages')
         .delete()
         .eq('listing_id',id);
 
@@ -62,8 +62,8 @@ function UserListing() {
             {listing&&listing.map((item,index)=>(
                  <div className='p-3 hover:border hover:border-primary rounded-lg cursor-pointer'>
                     <h2 className='bg-primary m-1 rounded-lg text-white absolute px-2 text-sm p-1'>{item.active?'Published':'Draft'}</h2>
-                 <Image src={item?.listingImages[0]?
-                 item?.listingImages[0]?.url
+                 <Image src={item?.listingimages[0]?
+                 item?.listingimages[0]?.url
                 :'/placeholder.svg'
                 }
                  width={800}
