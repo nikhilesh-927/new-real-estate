@@ -34,16 +34,16 @@ function ListingMapView({ type }) {
     }
   };
 
-  const handleSearchClick = async () => {
-    console.log("Searched Address Object:", searchedAddress);
-
+  const handleSearchClick = async (selectedAddr) => {
+    console.log("Searched Address Object:", selectedAddr);
+  
     const searchTerm =
-      searchedAddress?.value?.structured_formatting?.main_text ||
-      searchedAddress?.label ||
+      selectedAddr?.value?.structured_formatting?.main_text ||
+      selectedAddr?.label ||
       "";
-
+  
     console.log("Search Term:", searchTerm);
-
+  
     let query = supabase
       .from("listing")
       .select(
@@ -58,26 +58,27 @@ function ListingMapView({ type }) {
       .gte("bathroom", parseInt(bathCount || 0))
       .gte("parking", parseInt(parkingCount || 0))
       .order("id", { ascending: false });
-
+  
     if (searchTerm) {
       query = query.like("address", `%${searchTerm}%`);
     }
-
+  
     if (homeType) {
       query = query.eq("propertyType", homeType);
     }
-
+  
     const { data, error } = await query;
-
+  
     if (error) {
       console.error("Search error:", error);
       toast("Something went wrong while fetching listings.");
     }
-
+  
     if (data) {
       setListing(data);
     }
   };
+  
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

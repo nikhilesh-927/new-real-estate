@@ -1,10 +1,10 @@
 import { Bath, BedDouble, MapPin, Ruler, Search } from 'lucide-react'
 import Image from 'next/image'
 import React, { useState } from 'react'
-import GoogleAddressSearch from './GoogleAddressSearch'
 import { Button } from '@/components/ui/button'
 import FilterSection from './FilterSection'
 import Link from 'next/link'
+import LocationIQAddressSearch from './GoogleAddressSearch'
 
 function Listing({listing,handleSearchClick,searchedAddress,
     setBathCount,
@@ -13,33 +13,46 @@ function Listing({listing,handleSearchClick,searchedAddress,
     setHomeType,
     setCoordinates
 }) {
-  const [address,setAddress]=useState();
-  return (
-    <div>
+    const [address, setAddress] = useState();         // Final selected address (after search)
+    const [tempAddress, setTempAddress] = useState(); // Live address selection from dropdown
+    
+    return (
+      <div>
         <div className='p-3 flex gap-6'>
-        <GoogleAddressSearch
-        selectedAddress={(v)=>{searchedAddress(v);
-        setAddress(v)}}
-        setCoordinates={setCoordinates}
-        />
-        <Button className="flex gap-2"
-        onClick={handleSearchClick}
-        >
-             <Search className='h-4 w-4'/> 
-        Search</Button>
-        </div>
-            <FilterSection
-            setBathCount={setBathCount}
-            setBedCount={setBedCount}
-            setParkingCount={setParkingCount}
-            setHomeType={setHomeType}
-            />
+          <LocationIQAddressSearch
+            selectedAddress={(v) => setTempAddress(v)} // only temporary
+            setCoordinates={setCoordinates}
+          />
+<Button
+  className="flex gap-2"
+  onClick={() => {
+    setAddress(tempAddress);            // updates UI
+    searchedAddress(tempAddress);       // updates parent
+    handleSearchClick(tempAddress);     // ensures correct address is used
+  }}
+>
+  <Search className="h-4 w-4" />
+  Search
+</Button>
 
-        {address&&<div className='px-3 my-5'>
-           <h2 className='text-xl'>
-           Found  <span className='font-bold'>{listing?.length}</span> Result in <span className='text-primary font-bold'>{address?.label}</span></h2> 
-           
-        </div>}
+        </div>
+    
+        <FilterSection
+          setBathCount={setBathCount}
+          setBedCount={setBedCount}
+          setParkingCount={setParkingCount}
+          setHomeType={setHomeType}
+        />
+    
+        {address && (
+          <div className='px-3 my-5'>
+            <h2 className='text-xl'>
+              Found <span className='font-bold'>{listing?.length}</span> Result in{" "}
+              <span className='text-primary font-bold'>{address?.label}</span>
+            </h2>
+          </div>
+        )}
+    
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             {listing?.length>0? listing.map((item,index)=>item?.listingimages[0]?.url&&(
                <Link href={'/view-listing/'+item.id}>

@@ -6,7 +6,7 @@ import Select from "react-select";
 
 const LOCATIONIQ_API_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY;
 
-function LocationIQAddressSearch({ selectedAddress, setCoordinates }) {
+function LocationIQAddressSearch({ selectedAddress, setCoordinates}) {
   const [options, setOptions] = useState([]);
 
   const handleInputChange = async (inputValue) => {
@@ -33,7 +33,7 @@ function LocationIQAddressSearch({ selectedAddress, setCoordinates }) {
   const handleChange = async (selectedOption) => {
     if (!selectedOption) return;
 
-    selectedAddress(selectedOption);
+   selectedAddress(selectedOption);
 
     try {
       const res = await fetch(
