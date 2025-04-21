@@ -40,15 +40,15 @@ const FitBounds = ({ markers }) => {
 
 function GoogleMapSection({ coordinates, listing = [] }) {
   const [center, setCenter] = useState({
-    lat: 40.73061, // Default center (New York)
-    lng: -73.935242,
+    latitude: 40.73061, // Default center (New York)
+    longitude: -73.935242,
   });
 
   useEffect(() => {
     if (coordinates?.latitude && coordinates?.longitude) {
       setCenter({
-        lat: coordinates.latitude,
-        lng: coordinates.longitude,
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
       });
     }
   }, [coordinates]);
@@ -56,7 +56,7 @@ function GoogleMapSection({ coordinates, listing = [] }) {
   return (
     <div>
       <MapContainer
-        center={[center.lat, center.lng]}
+        center={[center.latitude, center.longitude]}
         zoom={10}
         scrollWheelZoom
         style={containerStyle}
@@ -77,11 +77,11 @@ function GoogleMapSection({ coordinates, listing = [] }) {
               coords = item.coordinates; // Already an object
             }
 
-            const lat = parseFloat(coords.latitude);
-            const lng = parseFloat(coords.longitude);
+            const latitude = parseFloat(coords.latitude);
+            const longitude = parseFloat(coords.longitude);
 
-            if (lat && lng) {
-              return <MarkerItem key={index} item={{ ...item, latitude: lat, longitude: lng }} />;
+            if (latitude && longitude) {
+              return <MarkerItem key={index} item={{ ...item, latitude: latitude, longitude: longitude }} />;
             }
           } catch (err) {
             console.error("Error parsing coordinates", err);

@@ -43,7 +43,7 @@ function LocationIQAddressSearch({ selectedAddress, setCoordinates}) {
 
       if (data && data[0]) {
         const { lat, lon } = data[0];
-        setCoordinates({ lat: parseFloat(lat), lng: parseFloat(lon) });
+        setCoordinates({ latitude: parseFloat(lat), longitude: parseFloat(lon) });
       }
     } catch (err) {
       console.error("Geocoding error:", err);
