@@ -1,10 +1,8 @@
-'use client'; // Needed if using Next.js App Router
-
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import MarkerItem from './MarkerItem'; // Your custom MarkerItem component
-import 'leaflet/dist/leaflet.css'; // Make sure this is included!
+import MarkerItem from './MarkerItem';
+import 'leaflet/dist/leaflet.css';
 
 const containerStyle = {
   width: '100%',
@@ -12,19 +10,29 @@ const containerStyle = {
   borderRadius: 10,
 };
 
-// Component to fit bounds dynamically
 const FitBounds = ({ markers }) => {
   const map = useMap();
 
   useEffect(() => {
-    if (markers.length === 0) return;
-
     const bounds = L.latLngBounds(
-      markers.map(item => [item.latitude, item.longitude])
+      markers
+        .map(item => {
+          let coords;
+          // Check if coordinates need parsing
+          if (typeof item.coordinates === 'string') {
+            coords = JSON.parse(item.coordinates);
+          } else {
+            coords = item.coordinates; // Already an object
+          }
+
+          return [parseFloat(coords.latitude), parseFloat(coords.longitude)];
+        })
+        .filter(Boolean)
     );
 
-    map.invalidateSize(); // Important fix for layout issues
-    map.fitBounds(bounds, { padding: [50, 50] });
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
   }, [markers, map]);
 
   return null;
@@ -32,13 +40,10 @@ const FitBounds = ({ markers }) => {
 
 function GoogleMapSection({ coordinates, listing = [] }) {
   const [center, setCenter] = useState({
-    lat: 40.73061,
-    lng: -73.935242, // Default to NYC
+    lat: 40.73061, // Default center (New York)
+    lng: -73.935242,
   });
 
-  const [map, setMap] = useState(null);
-
-  // Update center when coordinates prop changes
   useEffect(() => {
     if (coordinates?.latitude && coordinates?.longitude) {
       setCenter({
@@ -48,48 +53,41 @@ function GoogleMapSection({ coordinates, listing = [] }) {
     }
   }, [coordinates]);
 
-  // Filter out invalid listings
-  const validListings = listing.filter(
-    item => item.latitude != null && item.longitude != null
-  );
-
-  const onLoad = useCallback((mapInstance) => {
-    setMap(mapInstance);
-  }, []);
-
-  const onUnmount = useCallback(() => {
-    setMap(null);
-  }, []);
-
   return (
     <div>
       <MapContainer
         center={[center.lat, center.lng]}
         zoom={10}
-        style={containerStyle}
-        whenCreated={onLoad}
-        whenReady={() => {
-          if (map && validListings.length > 0) {
-            const bounds = L.latLngBounds(
-              validListings.map(item => [item.latitude, item.longitude])
-            );
-            map.fitBounds(bounds, { padding: [50, 50] });
-          }
-        }}
         scrollWheelZoom
+        style={containerStyle}
       >
         <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
 
-        {/* Auto fit bounds */}
-        <FitBounds markers={validListings} />
+        <FitBounds markers={listing} />
 
-        {/* Render custom marker components */}
-        {validListings.map((item, index) => (
-          <MarkerItem key={index} item={item} />
-        ))}
+        {listing.map((item, index) => {
+          try {
+            let coords;
+            if (typeof item.coordinates === 'string') {
+              coords = JSON.parse(item.coordinates);
+            } else {
+              coords = item.coordinates; // Already an object
+            }
+
+            const lat = parseFloat(coords.latitude);
+            const lng = parseFloat(coords.longitude);
+
+            if (lat && lng) {
+              return <MarkerItem key={index} item={{ ...item, latitude: lat, longitude: lng }} />;
+            }
+          } catch (err) {
+            console.error("Error parsing coordinates", err);
+            return null;
+          }
+        })}
       </MapContainer>
     </div>
   );

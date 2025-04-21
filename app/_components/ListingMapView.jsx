@@ -21,26 +21,27 @@ function ListingMapView({type}) {
         getLatestListing();
     },[])
 
-    const getLatestListing=async()=>{
-        const {data,error}=await supabase
-        .from('listing')
-        .select(`*,listingimages(
-            url,
-            listing_id
-        )`)
-        .eq('active',true)
-        .eq('type',type)
-        .order('id',{ascending:false})
-
-        if(data)
-        {
-            setListing(data);
+    useEffect(() => {
+        getLatestListing();
+      }, []);
+      
+      const getLatestListing = async () => {
+        const { data, error } = await supabase
+          .from('listing')
+          .select(`*,listingimages(url, listing_id)`)
+          .eq('active', true)
+          .eq('type', type)
+          .order('id', { ascending: false });
+      
+        if (data) {
+          console.log("Listing Data:", data);  // Log the listing data
+          setListing(data);
         }
-        if(error)
-        {
-            toast('Server Side Error')
+        if (error) {
+          toast('Server Side Error');
         }
-    }
+      };
+      
 
     const handleSearchClick=async()=>{
         console.log(searchedAddress);
