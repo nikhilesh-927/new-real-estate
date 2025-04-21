@@ -20,7 +20,7 @@ function Details({ listingDetail }) {
       <div className="my-6 flex gap-2 flex-col">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="font-bold text-3xl">$ {listingDetail?.price}</h2>
+            <h2 className="font-bold text-3xl">₹ {listingDetail?.price}</h2>
             <h2 className="text-gray-500 text-lg flex gap-2">
               <MapPin />
               {listingDetail?.address}

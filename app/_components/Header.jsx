@@ -52,7 +52,7 @@ function Header() {
           <DropdownMenuTrigger asChild>
             <Image src={user?.imageUrl} 
             width={35} height={35} alt='user profile'
-            className='rounded-full'
+            className='rounded-full cursor-pointer'
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent>

@@ -244,7 +244,7 @@ function EditListing({ params }) {
                                 </div>
                                 <div className='grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10'>
                                     <div className='flex gap-2 flex-col'>
-                                        <h2 className='text-gray-500'>Selling Price ($)</h2>
+                                        <h2 className='text-gray-500'>Selling Price (₹)</h2>
                                         <Input type="number" placeholder="400000" name="price"
                                             onChange={handleChange}
                                             defaultValue={listing?.price} />
